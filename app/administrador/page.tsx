@@ -18,6 +18,8 @@ export default function Admin() {
   const [lojaId, setLojaId] = useState("");
   // NOVO: Estado para guardar o arquivo da foto
   const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   
   const [lojas, setLojas] = useState<any[]>([]);
   const [produtos, setProdutos] = useState<any[]>([]);
@@ -58,6 +60,16 @@ export default function Admin() {
     setTimeout(() => setToast(null), 3500);
   }
 
+  function handleFileSelect(file: File | null) {
+    setFotoArquivo(file);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }
+
   async function cadastrarProduto(e: any) {
     e.preventDefault();
     setLoading(true);
@@ -96,7 +108,7 @@ export default function Admin() {
         showToast("Produto cadastrado com sucesso!", "success");
         const novo = await res.json();
         setProdutos(prev => [novo.dados[0], ...prev]);
-        setNome(""); setPreco(""); setLojaId(""); setFotoArquivo(null); // Limpa tudo
+        setNome(""); setPreco(""); setLojaId(""); setFotoArquivo(null); setPreviewUrl(null); // Limpa tudo
       } else {
         showToast("Erro ao salvar no banco.", "error");
       }
@@ -151,6 +163,13 @@ export default function Admin() {
         input[type="file"] { margin-top: 5px; font-size: 13px; }
         .btn-primary { background: var(--accent); color: white; padding: 10px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; }
         .toast { position: fixed; bottom: 20px; right: 20px; background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 4px solid var(--success); }
+        .upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 28px 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: #fafafa; position: relative; }
+        .upload-zone:hover, .upload-zone.dragging { border-color: var(--accent); background: #eff6ff; }
+        .upload-zone input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; }
+        .upload-icon { width: 40px; height: 40px; background: #e0e7ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+        .upload-preview { position: relative; display: inline-block; }
+        .upload-preview img { width: 100%; max-height: 160px; object-fit: cover; border-radius: 6px; display: block; }
+        .upload-preview-remove { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.55); border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; color: white; font-size: 14px; display: flex; align-items: center; justify-content: center; }
       `}</style>
 
       <header className="topbar">
@@ -202,13 +221,45 @@ export default function Admin() {
                 </div>
                 <div>
                   <label style={{ fontSize: "12px", fontWeight: 600 }}>Foto do Produto *</label>
-                  <br />
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={e => setFotoArquivo(e.target.files ? e.target.files[0] : null)} 
-                    required 
-                  />
+                  <div style={{ marginTop: "5px" }}>
+                    {previewUrl ? (
+                      <div className="upload-preview">
+                        <img src={previewUrl} alt="Preview" />
+                        <button
+                          type="button"
+                          className="upload-preview-remove"
+                          onClick={() => handleFileSelect(null)}
+                          title="Remover foto"
+                        >✕</button>
+                        <p style={{ fontSize: "12px", color: "var(--muted)", marginTop: "6px" }}>
+                          📎 {fotoArquivo?.name}
+                        </p>
+                      </div>
+                    ) : (
+                      <div
+                        className={`upload-zone${isDragging ? " dragging" : ""}`}
+                        onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={e => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFileSelect(f); }}
+                      >
+                        <input
+                          type="file"
+                          accept="image/*"
+                          required={!fotoArquivo}
+                          onChange={e => handleFileSelect(e.target.files ? e.target.files[0] : null)}
+                        />
+                        <div className="upload-icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                          </svg>
+                        </div>
+                        <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--text)", marginBottom: "4px" }}>
+                          Arraste uma imagem ou <span style={{ color: "var(--accent)" }}>clique para escolher</span>
+                        </p>
+                        <p style={{ fontSize: "11px", color: "var(--muted)" }}>PNG, JPG ou WEBP — até 5 MB</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <button type="submit" disabled={loading} className="btn-primary">
                   {loading ? "Salvando imagem e produto..." : "Publicar Produto"}
