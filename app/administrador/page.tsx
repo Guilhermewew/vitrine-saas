@@ -242,7 +242,13 @@ export default function Admin() {
 }
 
 // Estilos auxiliares
-const loginInput = { width: "100%", padding: "12px", marginBottom: "12px", borderRadius: "8px", border: "1px solid #e5e7eb", outline: "none" };
-const loginBtn = { width: "100%", padding: "12px", background: "#2563eb", color: "white", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" };
-const thStyle = { textAlign: "left" as const, padding: "12px 20px", fontSize: "11px", textTransform: "uppercase" as const, color: "#6b7280" };
-const tdStyle = { padding: "12px 20px", fontSize: "14px" };
+const loginInput = { 
+  width: "100%", 
+  padding: "12px", 
+  marginBottom: "12px", 
+  borderRadius: "8px", 
+  border: "1px solid #e5e7eb", 
+  outline: "none",
+  color: "#111827", // Isso garante que o texto digitado seja preto/escuro
+  backgroundColor: "#ffffff" // Garante que o fundo da caixa seja branco
+};
