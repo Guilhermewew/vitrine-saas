@@ -6,12 +6,12 @@ export default function Home() {
   const [produtos, setProdutos] = useState<any[]>([]);
 
   useEffect(() => {
-    // Busca lojas
+    // Busca as lojas para o topo do site
     fetch("https://motor-saas-ltb4.onrender.com/lojas")
       .then((res) => res.json())
       .then((dados) => setLojas(dados));
     
-    // Busca produtos reais do banco
+    // Busca os produtos cadastrados no banco
     fetch("https://motor-saas-ltb4.onrender.com/produtos")
       .then((res) => res.json())
       .then((dados) => setProdutos(dados));
@@ -46,7 +46,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* LISTA DE PRODUTOS DINÂMICA */}
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px" }}>
         {produtos.map((prod) => (
           <div key={prod.id} style={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "15px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", textAlign: "center" }}>
@@ -66,7 +65,6 @@ export default function Home() {
           </div>
         ))}
       </section>
-
     </div>
   );
 }
