@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [lojas, setLojas] = useState([]);
+  const [lojas, setLojas] = useState<any[]>([]);
 
   // Pede a lista de lojas pro garçom (Python) assim que entra no site
   useEffect(() => {
